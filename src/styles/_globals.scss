@@ -5,3 +5,11 @@
 $gray: #f4f4f7;
 $coral: #fde9e9;
 $purple: #711fff;
+$lightpurple: rgba(113, 31, 255, 0.25);
+//mixins
+//animations
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}

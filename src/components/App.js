@@ -12,7 +12,7 @@ function App() {
         {user ? <Home /> : <Redirect to={{ pathname: "account" }} />}
       </Route>
       <Route path="/account">
-        <Account />
+        {user ? <Redirect to={{ pathname: "/" }} /> : <Account />}
       </Route>
     </Switch>
   );
