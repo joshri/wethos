@@ -6,7 +6,7 @@ export const getConfig = (arr) => {
     url: arr[0],
     method: arr[1],
     data: arr[2],
-    baseURL: `${process.env.BASE_URL}`,
+    baseURL: "https://development.api.teams.wethos.co/api/v2/",
   };
   let user = localStorage.getItem("user");
   if (user) {
@@ -18,7 +18,6 @@ export const getConfig = (arr) => {
       config.headers = { Authorization: `Bearer: ${user.token}` };
     }
   }
-  console.log(config);
   return config;
 };
 

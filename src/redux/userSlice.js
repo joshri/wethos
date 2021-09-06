@@ -1,28 +1,50 @@
-import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  isAnyOf,
+  isRejectedWithValue,
+} from "@reduxjs/toolkit";
 import { getConfig } from "../utils";
 const axios = require("axios");
 
-export const login = createAsyncThunk("user/login", async (inputs) => {
-  const config = getConfig([
-    "token",
-    "post",
-    {
-      client_id: 2,
-      client_secret: `${process.env.CLIENT_SECRET}`,
-      grant_type: "password",
-      password: inputs.password,
-      scope: "*",
-      username: inputs.email,
-    },
-  ]);
-  const res = await axios.request(config);
-  if (res.statusText === "OK")
-    localStorage.setItem(
-      "user",
-      JSON.stringify({ ...res.data, exp: Date.now() + res.data.expires_in })
-    );
-  return res.data;
-});
+export const login = createAsyncThunk(
+  "user/login",
+  async (inputs, { rejectWithValue }) => {
+    const config = getConfig([
+      "token",
+      "post",
+      {
+        client_id: 2,
+        client_secret: `${process.env.CLENT_SECRET}`,
+        grant_type: "password",
+        password: inputs.password,
+        scope: "*",
+        username: inputs.email,
+      },
+    ]);
+    try {
+      const res = await axios.request(config);
+      if (res.data) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...res.data,
+            exp: Date.now() + res.data.expires_in,
+          })
+        );
+        return res.data;
+      }
+    } catch (res) {
+      return rejectWithValue(
+        res.response
+          ? res.response.data.message
+            ? res.response.data.message
+            : "Unknown Error. Please try again."
+          : "Network Error. Please try again."
+      );
+    }
+  }
+);
 
 export const userSlice = createSlice({
   name: "user",
@@ -44,7 +66,7 @@ export const userSlice = createSlice({
         state.error = null;
         state.status = "loading";
       })
-      .addCase(login.rejected, (state, action) => {
+      .addMatcher(isRejectedWithValue(login), (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

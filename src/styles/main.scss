@@ -64,6 +64,10 @@ footer {
   height: 15vh;
   background: linear-gradient(to bottom, $gray 1%, $lightpurple);
 }
+.footer-links {
+  width: 100%;
+  max-width: 800px;
+}
 
 //text
 h1 {
