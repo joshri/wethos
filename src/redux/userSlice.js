@@ -1,13 +1,33 @@
 import { createSlice, createAsyncThunk, isAnyOf } from "@reduxjs/toolkit";
+import { getConfig } from "../utils";
+const axios = require("axios");
 
 export const login = createAsyncThunk("user/login", async (inputs) => {
-  return true;
+  const config = getConfig([
+    "token",
+    "post",
+    {
+      client_id: 2,
+      client_secret: `${process.env.CLIENT_SECRET}`,
+      grant_type: "password",
+      password: inputs.password,
+      scope: "*",
+      username: inputs.email,
+    },
+  ]);
+  const res = await axios.request(config);
+  if (res.statusText === "OK")
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ ...res.data, exp: Date.now() + res.data.expires_in })
+    );
+  return res.data;
 });
 
 export const userSlice = createSlice({
   name: "user",
   initialState: {
-    user: null,
+    user: localStorage.getItem("user") ? true : false,
     status: "idle" | "loading" | "succeeded" | "failed",
     error: null,
   },
