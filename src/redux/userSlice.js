@@ -46,10 +46,12 @@ export const login = createAsyncThunk(
   }
 );
 
+// user: localStorage.getItem("user") ? true : false,
+
 export const userSlice = createSlice({
   name: "user",
   initialState: {
-    user: localStorage.getItem("user") ? true : false,
+    user: true,
     status: "idle" | "loading" | "succeeded" | "failed",
     error: null,
   },

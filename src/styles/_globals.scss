@@ -7,6 +7,9 @@ $coral: #fde9e9;
 $purple: #711fff;
 $lightpurple: rgba(113, 31, 255, 0.25);
 //mixins
+@mixin purple-gradient($direction, $grayPercent) {
+  background: linear-gradient(to $direction, $gray $grayPercent, $lightpurple);
+}
 //animations
 @keyframes rotate {
   100% {

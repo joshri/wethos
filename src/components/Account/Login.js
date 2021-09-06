@@ -26,7 +26,7 @@ export default function Login() {
   return (
     <section style={{ height: "90%" }}>
       <div className="login-container">
-        <h1 style={{ width: "100%" }}>Sign In:</h1>
+        <h1>Sign In:</h1>
         <form style={{ height: "90%", width: "100%" }} onSubmit={onSubmit}>
           <Input displayName="EMAIL" labelName="email" onChange={onChange} />
           <Input
@@ -36,11 +36,13 @@ export default function Login() {
             onChange={onChange}
           />
           <button type="submit">submit</button>
-          {error ? (
-            <p className="error-text">{error}</p>
-          ) : (
-            <LoadingIndicator status={status} />
-          )}
+          <div style={{ height: "10%" }}>
+            {error ? (
+              <p className="error-text">{error}</p>
+            ) : (
+              <LoadingIndicator status={status} />
+            )}
+          </div>
         </form>
       </div>
     </section>
