@@ -2,16 +2,18 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getProjects } from "../../redux/projectSlice";
 import useWindowDimensions, { dateString, priceString } from "../../utils";
+import LoadingIndicator from "../Utils/LoadingIndicator";
 
 export default function Projects() {
   const projects = useSelector((state) => state.project.project);
   const status = useSelector((state) => state.project.status);
   const error = useSelector((state) => state.project.error);
+
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   dispatch(getProjects())
-  // }, [])
+  useEffect(() => {
+    dispatch(getProjects());
+  }, []);
 
   return (
     <section style={{ height: "100%" }}>
@@ -30,27 +32,49 @@ export default function Projects() {
                 <th style={{ width: "20%" }}>TOTAL PRICE</th>
               </tr>
             </thead>
-            <tbody>
-              {projects.map((project, index) => {
-                return (
-                  <tr key={index}>
-                    <td style={{ width: "20%" }}>
-                      {dateString(project.created_at)}
-                    </td>
-                    <td style={{ width: "30%" }}>{project.client_name}</td>
-                    <td style={{ width: "20%" }}>{project.name}</td>
-                    <td style={{ width: "10%" }}>{project.status}</td>
-                    <td style={{ width: "20%" }}>
-                      ${priceString(project.price_total)}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
+            {!projects || status === "loading" ? (
+              <tbody>
+                <tr>
+                  <td>
+                    {error ? (
+                      <p className="error-text">{error}</p>
+                    ) : (
+                      <LoadingIndicator status={status} />
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            ) : (
+              <tbody>
+                {projects.data.map((project, index) => {
+                  return (
+                    <tr key={index}>
+                      <td style={{ width: "20%" }}>
+                        {dateString(project.created_at)}
+                      </td>
+                      <td style={{ width: "30%" }}>{project.client_name}</td>
+                      <td style={{ width: "20%" }}>{project.name}</td>
+                      <td style={{ width: "10%" }}>{project.status}</td>
+                      <td style={{ width: "20%" }}>
+                        ${priceString(project.price_total)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            )}
           </table>
+        ) : !projects || status === "loading" ? (
+          <div>
+            {error ? (
+              <p className="error-text">{error}</p>
+            ) : (
+              <LoadingIndicator status={status} />
+            )}
+          </div>
         ) : (
           <ul>
-            {projects.map((project, index) => {
+            {projects.data.map((project, index) => {
               return (
                 <div key={index} className="project-card">
                   <div

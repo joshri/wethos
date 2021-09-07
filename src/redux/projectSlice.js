@@ -1,20 +1,34 @@
 import {
   createSlice,
   createAsyncThunk,
-  isAnyOf,
   isRejectedWithValue,
 } from "@reduxjs/toolkit";
-import { projectTestData } from "../utils";
+import Api from "../api/api";
+const axios = require("axios");
 
 export const getProjects = createAsyncThunk(
   "project/getProjects",
-  async () => {}
+  async (arg, { rejectWithValue }) => {
+    const config = await Api.getConfig(["api/v2/projects", "get", null]);
+    try {
+      const res = await axios.request(config);
+      return res.data;
+    } catch (res) {
+      return rejectWithValue(
+        res.response
+          ? res.response.data.message
+            ? res.response.data.message
+            : "Unknown Error. Please try again."
+          : "Network Error. Please try again."
+      );
+    }
+  }
 );
 
 export const projectSlice = createSlice({
   name: "project",
   initialState: {
-    project: projectTestData,
+    project: null,
     status: "idle" | "loading" | "succeeded" | "failed",
     error: null,
   },

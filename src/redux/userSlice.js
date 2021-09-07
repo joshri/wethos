@@ -1,21 +1,20 @@
 import {
   createSlice,
   createAsyncThunk,
-  isAnyOf,
   isRejectedWithValue,
 } from "@reduxjs/toolkit";
-import { getConfig } from "../utils";
+import Api from "../api/api";
 const axios = require("axios");
 
 export const login = createAsyncThunk(
   "user/login",
   async (inputs, { rejectWithValue }) => {
-    const config = getConfig([
-      "token",
+    const config = await Api.getConfig([
+      "oauth/token",
       "post",
       {
         client_id: 2,
-        client_secret: `${process.env.CLENT_SECRET}`,
+        client_secret: "GjUJ5tqVliDdTadQDn4eQYQPUtLKjRLICu0qmrTR",
         grant_type: "password",
         password: inputs.password,
         scope: "*",
@@ -24,16 +23,14 @@ export const login = createAsyncThunk(
     ]);
     try {
       const res = await axios.request(config);
-      if (res.data) {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            ...res.data,
-            exp: Date.now() + res.data.expires_in,
-          })
-        );
-        return res.data;
-      }
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          ...res.data,
+          exp: Date.now() + res.data.expires_in,
+        })
+      );
+      return res.data;
     } catch (res) {
       return rejectWithValue(
         res.response
@@ -46,23 +43,30 @@ export const login = createAsyncThunk(
   }
 );
 
-// user: localStorage.getItem("user") ? true : false,
-
 export const userSlice = createSlice({
   name: "user",
   initialState: {
-    user: false,
+    user: localStorage.getItem("user") ? true : false,
     status: "idle" | "loading" | "succeeded" | "failed",
     error: null,
   },
   reducers: {
+    logout: {
+      reducer: (state) => {
+        state.user = false;
+      },
+      prepare: () => {
+        localStorage.removeItem("user");
+        return { payload: {} };
+      },
+    },
     setUserError: (state, action) => void (state.error = action.payload),
   },
   extraReducers: (builder) => {
     builder
-      .addCase(login.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state) => {
         state.status = "succeeded";
-        state.user = action.payload;
+        state.user = true;
       })
       .addCase(login.pending, (state) => {
         state.error = null;
@@ -75,6 +79,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUserError } = userSlice.actions;
+export const { logout, setUserError } = userSlice.actions;
 
 export default userSlice.reducer;
