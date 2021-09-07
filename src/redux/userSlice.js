@@ -51,7 +51,7 @@ export const login = createAsyncThunk(
 export const userSlice = createSlice({
   name: "user",
   initialState: {
-    user: true,
+    user: false,
     status: "idle" | "loading" | "succeeded" | "failed",
     error: null,
   },
